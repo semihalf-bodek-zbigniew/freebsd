@@ -111,6 +111,7 @@ struct arm_gic_softc {
 };
 
 static struct ofw_compat_data compat_data[] = {
+	{ "arm,cortex-a15-gic", 1 },
 	{ "arm,cortex-a9-gic", 1 },
 	{ "arm,gic", 1 },
 	{ NULL, 0 },
