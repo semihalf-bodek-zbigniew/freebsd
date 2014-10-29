@@ -34,6 +34,10 @@ int arm64_getdev(void **vdev, const char *devspec, const char **path);
 char *arm64_fmtdev(void *vdev);
 int arm64_setcurrdev(struct env_var *ev, int flags, const void *value);
 
+/* cache.c */
+void cpu_flush_dcache(const void *, size_t);
+void cpu_inval_icache(const void *, size_t);
+
 /* copy.c */
 int arm64_efi_copy_init(void);
 void *arm64_efi_translate(vm_offset_t ptr);

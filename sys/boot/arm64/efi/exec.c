@@ -62,6 +62,8 @@ static int
 elf64_exec(struct preloaded_file *fp)
 {
 	vm_offset_t modulep, kernendp;
+	vm_offset_t clean_addr;
+	size_t clean_size;
 	struct file_metadata *md;
 	EFI_STATUS status;
 	EFI_PHYSICAL_ADDRESS addr;
@@ -85,6 +87,13 @@ elf64_exec(struct preloaded_file *fp)
 		    (long)status);
 		return (EINVAL);
 	}
+
+	/* Clean D-cache under kernel area and invalidate whole I-cache */
+	clean_addr = arm64_efi_translate(fp->f_addr);
+	clean_size = arm64_efi_translate(kernendp) - clean_addr;
+
+	cpu_flush_dcache((void *)clean_addr, clean_size);
+	cpu_inval_icache(NULL, 0);
 
 	/* TODO: Pass the required metadata to the kernel */
 	(*entry)(modulep);
