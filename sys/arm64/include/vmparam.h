@@ -163,11 +163,13 @@
 #define	VM_MIN_ADDRESS		(0x0000000000000000UL)
 #define	VM_MAX_ADDRESS		(0xffffffffffffffffUL)
 
+/* 256 GiB of kernel addresses */
 #define	VM_MIN_KERNEL_ADDRESS	(0xffffff8000000000UL)
-#define	VM_MAX_KERNEL_ADDRESS	(0xffffff8800000000UL)
+#define	VM_MAX_KERNEL_ADDRESS	(0xffffffc000000000UL)
 
-#define	DMAP_MIN_ADDRESS	(0xffffff8800000000UL)
-#define	DMAP_MAX_ADDRESS	(0xffffff8fffffffffUL)
+/* Direct Map for 64 GiB of PA: 0x0 - 0xfffffffff */
+#define	DMAP_MIN_ADDRESS	(0xffffffc000000000UL)
+#define	DMAP_MAX_ADDRESS	(0xffffffcfffffffffUL)
 
 #ifdef INVARIANTS
 #include <sys/systm.h>
