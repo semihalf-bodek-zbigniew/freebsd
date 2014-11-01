@@ -153,6 +153,8 @@ void	pmap_kremove(vm_offset_t);
 void	*pmap_mapdev(vm_offset_t, vm_size_t);
 void	pmap_unmapdev(vm_offset_t, vm_size_t);
 
+#define	pmap_page_is_mapped(m)	(!TAILQ_EMPTY(&(m)->md.pv_list))
+
 #endif	/* _KERNEL */
 
 #endif	/* !LOCORE */
