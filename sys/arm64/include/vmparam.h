@@ -212,6 +212,7 @@
 
 extern u_int tsb_kernel_ldd_phys;
 extern vm_offset_t vm_max_kernel_address;
+extern vm_offset_t init_pt_va;
 
 #define	ZERO_REGION_SIZE	(64 * 1024)	/* 64KB */
 
