@@ -804,7 +804,7 @@ pmap_early_page_idx(vm_offset_t l1pt, vm_offset_t va, u_int *l1_slot,
 	KASSERT((l1[*l1_slot] & ATTR_DESCR_MASK) == L1_TABLE,
 	   ("Invalid bootstrap L1 table"));
 	/* Find the address of the L2 table */
-	l2 = (pt_entry_t *)PHYS_TO_DMAP(l1[*l1_slot] & ~ATTR_MASK);
+	l2 = (pt_entry_t *)init_pt_va;
 	*l2_slot = pmap_l2_index(va);
 
 	return (l2);

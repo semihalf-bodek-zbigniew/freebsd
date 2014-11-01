@@ -480,8 +480,18 @@ abort:
 
 	//.section .init_pagetable
 	.align 12 /* 4KiB aligned */
+	/*
+	 * 3 initial tables (in the following order):
+	 *           L2 for kernel (High addresses)
+	 *           L1 for kernel
+	 *           L1 for user   (Low addresses)
+	 */
 pagetable:
-	.space	(PAGE_SIZE * 3) /* 3 tables */
+	.space	(PAGE_SIZE * 3)
+
+	.globl init_pt_va
+init_pt_va:
+	.quad pagetable		/* XXX: Keep page tables VA */
 
 initstack:
 	.space	(PAGE_SIZE * KSTACK_PAGES)
