@@ -30,6 +30,7 @@
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
+#include "opt_global.h"
 #include "opt_platform.h"
 
 #include <sys/param.h>
@@ -199,8 +200,10 @@ uart_cpu_getdev(int devtype, struct uart_devinfo *di)
 	if (err)
 		pbase = 0;
 
+#ifdef SOC_ARM_FM
 	/* TODO: fdt_get_range to work with the Foundation Models dts */
 	pbase = 0x1c000000;
+#endif
 	start += pbase;
 
 	return (bus_space_map(di->bas.bst, start, size, 0, &di->bas.bsh));
