@@ -40,13 +40,11 @@ struct devsw *devsw[] = {
 };
 
 struct fs_ops *file_system[] = {
-#if 0
 	&dosfs_fsops,
 	&ufs_fsops,
 	&cd9660_fsops,
 	&nfs_fsops,
 	&gzipfs_fsops,
-#endif
 	&efifs_fsops,
 	NULL
 };
