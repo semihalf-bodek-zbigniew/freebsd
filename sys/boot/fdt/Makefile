@@ -15,7 +15,8 @@ CFLAGS+=	-I${.CURDIR}/../../contrib/libfdt/ -I${.CURDIR}/../common/
 
 CFLAGS+=	-ffreestanding
 
-.if ${MACHINE_CPUARCH} == "powerpc" || ${MACHINE_CPUARCH} == "arm" || ${MACHINE_CPUARCH} == "mips"
+.if ${MACHINE_CPUARCH} == "powerpc" || ${MACHINE_CPUARCH} == "arm" || \
+	${MACHINE_CPUARCH} == "arm64" || ${MACHINE_CPUARCH} == "mips"
 CFLAGS+=	-msoft-float
 .endif
 
