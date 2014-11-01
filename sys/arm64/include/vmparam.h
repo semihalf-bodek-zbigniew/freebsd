@@ -122,7 +122,7 @@
 /**
  * Address space layout.
  *
- * ARMv8 implements up to a 47 bit virtual address space. The address space is
+ * ARMv8 implements up to a 48 bit virtual address space. The address space is
  * split into 2 regions at each end of the 64 bit address space, with an
  * out of range "hole" in the middle.
  *
@@ -168,8 +168,31 @@
 
 #define	DMAP_MIN_ADDRESS	(0xffffff8800000000UL)
 #define	DMAP_MAX_ADDRESS	(0xffffff8fffffffffUL)
+
+#ifdef INVARIANTS
+#include <sys/systm.h>
+
+static inline vm_offset_t
+PHYS_TO_DMAP(vm_paddr_t pa)
+{
+
+	KASSERT((pa <= (DMAP_MAX_ADDRESS - DMAP_MIN_ADDRESS)),
+	    ("%s: PA out of range, PA: 0x%llx", __func__, pa));
+	return ((pa) | DMAP_MIN_ADDRESS);
+}
+
+static inline vm_paddr_t
+DMAP_TO_PHYS(vm_offset_t va)
+{
+
+	KASSERT(((va <= DMAP_MAX_ADDRESS) || (va >= DMAP_MIN_ADDRESS)),
+	    ("%s: VA out of range, VA: 0x%llx", __func__, va));
+	return ((va) & ~(DMAP_MIN_ADDRESS));
+}
+#else
 #define	PHYS_TO_DMAP(pa)	((pa) | DMAP_MIN_ADDRESS)
 #define	DMAP_TO_PHYS(va)	((va) & ~DMAP_MIN_ADDRESS)
+#endif
 
 #define	VM_MIN_USER_ADDRESS	(0x0000000000000000UL)
 #define	VM_MAX_USER_ADDRESS	(0x0000008000000000UL)
