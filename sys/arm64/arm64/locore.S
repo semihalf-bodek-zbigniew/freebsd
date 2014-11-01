@@ -87,12 +87,10 @@ virtdone:
 	/* Zero the BSS */
 	ldr	x15, .Lbss
 	ldr	x14, .Lend
-	b	2f
 1:
 	str	xzr, [x15], #8
 	cmp	x15, x14
 	b.lo	1b
-2:
 
 	/* Backup the module pointer */
 	mov	x1, x0
