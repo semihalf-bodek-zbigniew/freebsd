@@ -304,10 +304,10 @@ bi_load(char *args, vm_offset_t *modulep, vm_offset_t *kernendp)
 
 	dtbfp = file_findfile(NULL, "dtb");
 	if (dtbfp != NULL) {
-		printf("dtbfp = %llx %lld\n", dtbfp->f_addr, dtbfp->f_addr - kfp->f_addr);
+		printf("dtbfp = %llx\n", dtbfp->f_addr);
 
-		dtbp = dtbfp->f_addr - kfp->f_addr;
-		file_addmetadata(kfp, MODINFOMD_DTB_OFF, sizeof dtbp, &dtbp);
+		dtbp = dtbfp->f_addr;
+		file_addmetadata(kfp, MODINFOMD_DTBP, sizeof dtbp, &dtbp);
 	}
 
 	file_addmetadata(kfp, MODINFOMD_KERNEND, sizeof kernend, &kernend);
