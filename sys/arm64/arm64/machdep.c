@@ -25,6 +25,8 @@
  *
  */
 
+#include "opt_platform.h"
+
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
@@ -65,9 +67,10 @@ __FBSDID("$FreeBSD$");
 #include <machine/reg.h>
 #include <machine/vmparam.h>
 
+#ifdef FDT
+#include <dev/fdt/fdt_common.h>
 #include <dev/ofw/openfirm.h>
-
-#include "opt_platform.h"
+#endif
 
 struct pcpu __pcpu[MAXCPU];
 struct pcpu *pcpup = &__pcpu[0];
@@ -503,15 +506,27 @@ add_efi_map_entries(struct efi_map_header *efihdr, vm_paddr_t *physmap,
 static void
 try_load_dtb(caddr_t kmdp)
 {
-	vm_offset_t dtboff;
-	void *dtbp;
+	vm_offset_t dtbp;
 
-	dtboff = MD_FETCH(kmdp, MODINFOMD_DTB_OFF, vm_offset_t);
-	if (dtboff == 0)
+	dtbp = MD_FETCH(kmdp, MODINFOMD_DTBP, vm_offset_t);
+
+#if defined(FDT_DTB_STATIC)
+	/*
+	 * In case the device tree blob was not retrieved (from metadata) try
+	 * to use the statically embedded one.
+	 */
+	if (dtbp == (vm_offset_t)NULL) {
+		printf("Using static DTB\n");
+		dtbp = (vm_offset_t)&fdt_static_dtb;
+	}
+#endif
+
+	if (dtbp == (vm_offset_t)NULL) {
+		printf("ERROR loading DTB\n");
 		return;
+	}
 
-	dtbp = (void *)(KERNBASE + dtboff);
-	printf("dtbp = %llx\n", *(uint64_t *)(KERNBASE + dtboff));
+	printf("dtbp = %llx\n", dtbp);
 
 	if (OF_install(OFW_FDT, 0) == FALSE)
 		panic("Cannot install FDT");
