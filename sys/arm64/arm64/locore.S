@@ -35,7 +35,7 @@
 #include <machine/param.h>
 #include <machine/pte.h>
 
-#define	VIRT_BITS	38
+#define	VIRT_BITS	39
 
 	.globl	kernbase
 	.set	kernbase, KERNBASE
@@ -468,7 +468,7 @@ mair:
 		/* Device       Normal, no cache   Normal, write-back */
 	.quad	MAIR(0x00, 0) | MAIR(0x44, 1)    | MAIR(0xff, 2)
 tcr:
-	.quad (TCR_TxSZ(63 - VIRT_BITS) | TCR_ASID_16 | TCR_IPS_40BIT | \
+	.quad (TCR_TxSZ(64 - VIRT_BITS) | TCR_ASID_16 | TCR_IPS_40BIT | \
 	    TCR_TG1_4K)
 sctlr_set:
 	/* Bits to set */
