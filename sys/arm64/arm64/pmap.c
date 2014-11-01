@@ -1762,7 +1762,7 @@ pmap_kenter_device(vm_offset_t va, vm_paddr_t pa)
 	KASSERT((va & L3_OFFSET) == 0,
 	   ("pmap_kenter_device: Invalid virtual address"));
 	l3 = pmap_l3(kernel_pmap, va);
-	KASSERT(l3 != NULL, ("Invalid page table"));
+	KASSERT(l3 != NULL, ("Invalid page table, va: 0x%llx", va));
 	*l3 = (pa & ~L3_OFFSET) | ATTR_AF | L3_PAGE | ATTR_IDX(DEVICE_MEMORY);
 }
 
@@ -1853,7 +1853,7 @@ pmap_qremove(vm_offset_t sva, int count)
 
 	va = sva;
 	while (count-- > 0) {
-		KASSERT(va >= VM_MIN_KERNEL_ADDRESS, ("usermode va %lx", va));
+		KASSERT(va >= VM_MIN_KERNEL_ADDRESS, ("usermode va %llx", va));
 		pmap_kremove(va);
 		va += PAGE_SIZE;
 	}
@@ -2284,8 +2284,10 @@ pmap_release(pmap_t pmap)
 	KASSERT(pmap->pm_stats.resident_count == 0,
 	    ("pmap_release: pmap resident count %ld != 0",
 	    pmap->pm_stats.resident_count));
+#if 0
 	KASSERT(vm_radix_is_empty(&pmap->pm_root),
 	    ("pmap_release: pmap has reserved page table page(s)"));
+#endif
 
 	m = PHYS_TO_VM_PAGE(DMAP_TO_PHYS((vm_offset_t)pmap->pm_l1));
 
