@@ -66,5 +66,15 @@ intr_enable(void)
 	__asm __volatile("msr daifclr, #2");
 }
 
+static __inline register_t
+get_midr(void)
+{
+	uint64_t midr;
+
+	__asm __volatile("mrs %0, midr_el1" : "=&r" (midr));
+
+	return (midr);
+}
+
 #endif	/* _KERNEL */
 #endif	/* _MACHINE_CPUFUNC_H_ */

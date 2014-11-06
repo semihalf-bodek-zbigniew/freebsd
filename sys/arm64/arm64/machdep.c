@@ -89,9 +89,15 @@ u_int physmap_idx;
 
 struct kva_md_info kmi;
 
+/* TODO: Should be moved to header */
+extern void identify_cpu(void);
+
 static void
 cpu_startup(void *dummy)
 {
+
+	identify_cpu();
+
 	vm_ksubmap_init(&kmi);
 	bufinit();
 	vm_pager_bufferinit();
