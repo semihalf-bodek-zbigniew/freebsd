@@ -1,6 +1,10 @@
 /*-
  * Copyright (c) 2014 Andrew Turner
+ * Copyright (c) 2014 The FreeBSD Foundation
  * All rights reserved.
+ *
+ * Portions of this software were developed by Semihalf
+ * under sponsorship from the FreeBSD Foundation.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,5 +35,106 @@ __FBSDID("$FreeBSD$");
 #include <sys/param.h>
 #include <sys/systm.h>
 
+#include <machine/cpufunc.h>
+
+#define	ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
+
 char machine[] = "arm64";
 
+#define	CPU_IMPL_ARM		0x41
+#define	CPU_IMPL_BROADCOM	0x42
+#define	CPU_IMPL_CAVIUM		0x43
+#define	CPU_IMPL_DEC		0x44
+#define	CPU_IMPL_INFINEON	0x49
+#define	CPU_IMPL_FREESCALE	0x4D
+#define	CPU_IMPL_NVIDIA		0x4E
+#define	CPU_IMPL_APM		0x50
+#define	CPU_IMPL_QUALCOMM	0x51
+#define	CPU_IMPL_MARVELL	0x56
+#define	CPU_IMPL_INTEL		0x69
+
+#define	CPU_PART_CORTEX_A57	0xD00
+#define	CPU_PART_CORTEX_A53	0xD03
+
+#define	CPU_IMPL(midr)	(((midr) >> 24) & 0xff)
+#define	CPU_PART(midr)	(((midr) >> 4) & 0xfff)
+#define	CPU_VAR(midr)	(((midr) >> 20) & 0xf)
+#define	CPU_REV(midr)	(((midr) >> 0) & 0xf)
+
+struct cpu_desc {
+	u_int		cpu_impl;
+	u_int		cpu_part_num;
+	u_int		cpu_variant;
+	u_int		cpu_revision;
+	const char	*cpu_impl_name;
+	const char	*cpu_part_name;
+};
+
+struct cpu_desc cpu_desc;
+
+struct cpu_implementers {
+	u_int		impl_id;
+	const char	*impl_name;
+};
+
+const struct cpu_implementers cpu_implementers[] = {
+	{ CPU_IMPL_ARM,		"ARM" },
+	{ CPU_IMPL_BROADCOM,	"Broadcom" },
+	{ CPU_IMPL_CAVIUM,	"Cavium" },
+	{ CPU_IMPL_DEC,		"DEC" },
+	{ CPU_IMPL_INFINEON,	"IFX" },
+	{ CPU_IMPL_FREESCALE,	"Freescale" },
+	{ CPU_IMPL_NVIDIA,	"NVIDIA" },
+	{ CPU_IMPL_APM,		"APM" },
+	{ CPU_IMPL_QUALCOMM,	"Qualcomm" },
+	{ CPU_IMPL_MARVELL,	"Marvell" },
+	{ CPU_IMPL_INTEL,	"Intel" },
+	{ 0,			"Unknown Implementer" }
+};
+
+struct cpu_parts {
+	u_int		part_id;
+	const char	*part_name;
+};
+
+const struct cpu_parts cpu_parts[] = {
+	{ CPU_PART_CORTEX_A57, "Cortex-A57" },
+	{ CPU_PART_CORTEX_A53, "Cortex-A53" },
+	{ 0, "Unknown Processor" }
+};
+
+void identify_cpu(void);
+
+void
+identify_cpu(void)
+{
+	u_int midr;
+	u_int impl_id;
+	u_int part_id;
+	size_t i;
+
+	midr = get_midr();
+
+	impl_id = CPU_IMPL(midr);
+	for (i = 0; i < ARRAY_SIZE(cpu_implementers); i++) {
+		if (impl_id == cpu_implementers[i].impl_id ||
+		    cpu_implementers[i].impl_id == 0) {
+			cpu_desc.cpu_impl = impl_id;
+			cpu_desc.cpu_impl_name = cpu_implementers[i].impl_name;
+			break;
+		}
+	}
+
+	part_id = CPU_PART(midr);
+	for (i = 0; i < ARRAY_SIZE(cpu_parts); i++) {
+		if (part_id == cpu_parts[i].part_id ||
+		    cpu_parts[i].part_id == 0) {
+			cpu_desc.cpu_part_num = part_id;
+			cpu_desc.cpu_part_name = cpu_parts[i].part_name;
+			break;
+		}
+	}
+
+	printf("CPU: %s %s r%dp%d\n", cpu_desc.cpu_impl_name,
+	    cpu_desc.cpu_part_name, CPU_VAR(midr), CPU_REV(midr));
+}
